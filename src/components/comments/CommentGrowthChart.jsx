@@ -3,11 +3,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { motion } from "framer-motion";
 import axiosClient from "../../untils/axiosClient";
 
-const UserGrowthChart = () => {
-  const [userGrowthData, setUserGrowthData] = useState([]);
+const CommentGrowthChart = () => {
+  const [commentGrowthData, setCommentGrowthData] = useState([]);
 
   useEffect(() => {
-    const fetchUserGrowthData = async () => {
+    const fetchCommentGrowthData = async () => {
       const year = new Date().getFullYear(); // Năm hiện tại
       const months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -16,23 +16,25 @@ const UserGrowthChart = () => {
 
       try {
         const requests = months.map((_, index) =>
-          axiosClient.get(`/statistics/new-users-by-month?year=${year}&month=${index + 1}`)
+          axiosClient.get(`/statistics/count-comment-by-month?year=${year}&month=${index + 1}`)
         );
 
         const responses = await Promise.all(requests);
+        console.log(responses);
 
         const data = responses.map((response, index) => ({
           month: months[index],
-          users: response.data.newUsersByMonth || 0,
+          comments: response.data.totalCommentsByMonth || 0,
         }));
 
-        setUserGrowthData(data);
+      
+        setCommentGrowthData(data);
       } catch (error) {
-        console.error("Error fetching user growth data:", error);
+        console.error("Error fetching comment growth data:", error);
       }
     };
 
-    fetchUserGrowthData();
+    fetchCommentGrowthData();
   }, []);
 
   return (
@@ -41,10 +43,10 @@ const UserGrowthChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">User Growth</h2>
+      <h2 className="text-xl font-semibold text-gray-100 mb-4">Comment Growth</h2>
       <div className="h-[320px]">
         <ResponsiveContainer width="200%" height="100%">
-          <LineChart data={userGrowthData}>
+          <LineChart data={commentGrowthData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="month" stroke="#9CA3AF" />
             <YAxis stroke="#9CA3AF" />
@@ -57,7 +59,7 @@ const UserGrowthChart = () => {
             />
             <Line
               type="monotone"
-              dataKey="users"
+              dataKey="comments"
               stroke="#8B5CF6"
               strokeWidth={2}
               dot={{ fill: "#8B5CF6", strokeWidth: 2, r: 4 }}
@@ -70,4 +72,4 @@ const UserGrowthChart = () => {
   );
 };
 
-export default UserGrowthChart;
+export default CommentGrowthChart;

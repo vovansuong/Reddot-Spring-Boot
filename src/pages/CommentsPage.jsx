@@ -4,46 +4,46 @@ import { motion } from "framer-motion";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import UsersTable from "../components/users/UsersTable";
-import UserGrowthChart from "../components/users/UserGrowthChart";
+import CommentGrowthChart from "../components/comments/CommentGrowthChart";
 import UserActivityHeatmap from "../components/users/UserActivityHeatmap";
 import UserDemographicsChart from "../components/users/UserDemographicsChart";
 import axiosClient from "../untils/axiosClient";
 
-const UsersPage = () => {
-  const [userStats, setUserStats] = useState({
-    totalUsers: 0,
-    newUsersToday: 0, 
+const CommentsPage = () => {
+  const [commentStats, setCommentStats] = useState({
+    totalComments: 0,
+    newCommentsToday: 0, 
   });
 
   // Gọi API để lấy tổng số user và người dùng mới hôm nay
   useEffect(() => {
-    const fetchUserStats = async () => {
+    const fetchCommentStats = async () => {
       try {
-        // Fetch total users
-        const totalUsersResponse = await axiosClient.get("/statistics/count-user");
-        const totalUsers = totalUsersResponse.data.totalUsers;
+        // Fetch total comments
+        const totalCommentsResponse = await axiosClient.get("/statistics/count-comment");
+        const totalComments = totalCommentsResponse.data.totalComments;
 
-        // Fetch new users today
+        // Fetch new comment today
         const today = new Date().toISOString().split("T")[0]; // Lấy ngày hiện tại dạng YYYY-MM-DD
-        const newUsersResponse = await axiosClient.get(`/statistics/new-users-by-day?date=${today}`);
-        const newUsersToday = newUsersResponse.data.newUsersByDay;
+        const newCommentsResponse = await axiosClient.get(`/statistics/count-comment-by-day?date=${today}`);
+        const newCommentsToday = newCommentsResponse.data.totalCommentsByDay;
 
-        setUserStats((prevStats) => ({
+        setCommentStats((prevStats) => ({
           ...prevStats,
-          totalUsers,
-          newUsersToday,
+          totalComments,
+          newCommentsToday,
         }));
       } catch (error) {
-        console.error("Error fetching user statistics:", error);
+        console.error("Error fetching comments statistics:", error);
       }
     };
 
-    fetchUserStats();
+    fetchCommentStats();
   }, []);
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Users" />
+      <Header title="Comments" />
 
       <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
         {/* STATS */}
@@ -54,26 +54,26 @@ const UsersPage = () => {
           transition={{ duration: 1 }}
         >
           <StatCard
-            name="Total Users"
+            name="Total Comments"
             icon={UsersIcon}
-            value={userStats.totalUsers.toLocaleString()}
+            value={commentStats.totalComments.toLocaleString()}
             color="#6366F1"
           />
           <StatCard
-            name="New Users Today"
+            name="New Comments Today"
             icon={UserPlus}
-            value={userStats.newUsersToday}
+            value={commentStats.newCommentsToday}
             color="#10B981"
           />
          
         </motion.div>
-
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          <UserGrowthChart />
+          <CommentGrowthChart />
         </div>
       </main>
     </div>
   );
 };
 
-export default UsersPage;
+export default CommentsPage;

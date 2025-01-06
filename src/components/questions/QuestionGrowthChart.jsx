@@ -3,11 +3,11 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { motion } from "framer-motion";
 import axiosClient from "../../untils/axiosClient";
 
-const UserGrowthChart = () => {
-  const [userGrowthData, setUserGrowthData] = useState([]);
+const QuestionGrowthChart = () => {
+  const [questionGrowthData, setQuestionGrowthData] = useState([]);
 
   useEffect(() => {
-    const fetchUserGrowthData = async () => {
+    const fetchQuestionGrowthData = async () => {
       const year = new Date().getFullYear(); // Năm hiện tại
       const months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -16,23 +16,23 @@ const UserGrowthChart = () => {
 
       try {
         const requests = months.map((_, index) =>
-          axiosClient.get(`/statistics/new-users-by-month?year=${year}&month=${index + 1}`)
+          axiosClient.get(`/statistics/count-question-by-month?year=${year}&month=${index + 1}`)
         );
 
         const responses = await Promise.all(requests);
 
         const data = responses.map((response, index) => ({
           month: months[index],
-          users: response.data.newUsersByMonth || 0,
+          questions: response.data.totalQuestionsByMonth || 0,
         }));
 
-        setUserGrowthData(data);
+        setQuestionGrowthData(data);
       } catch (error) {
-        console.error("Error fetching user growth data:", error);
+        console.error("Error fetching question growth data:", error);
       }
     };
 
-    fetchUserGrowthData();
+    fetchQuestionGrowthData();
   }, []);
 
   return (
@@ -41,10 +41,10 @@ const UserGrowthChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
     >
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">User Growth</h2>
+      <h2 className="text-xl font-semibold text-gray-100 mb-4">Question Growth</h2>
       <div className="h-[320px]">
         <ResponsiveContainer width="200%" height="100%">
-          <LineChart data={userGrowthData}>
+          <LineChart data={questionGrowthData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="month" stroke="#9CA3AF" />
             <YAxis stroke="#9CA3AF" />
@@ -57,7 +57,7 @@ const UserGrowthChart = () => {
             />
             <Line
               type="monotone"
-              dataKey="users"
+              dataKey="questions"
               stroke="#8B5CF6"
               strokeWidth={2}
               dot={{ fill: "#8B5CF6", strokeWidth: 2, r: 4 }}
@@ -70,4 +70,4 @@ const UserGrowthChart = () => {
   );
 };
 
-export default UserGrowthChart;
+export default QuestionGrowthChart;
